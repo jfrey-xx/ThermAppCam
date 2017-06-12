@@ -7,27 +7,28 @@ extern "C" {
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
+#include <opencv2/contrib/contrib.hpp>
 
 using namespace std;
 using namespace cv;
 
 int thing(uint8_t img[], int w, int h) { 
 
-    CvMat imgcv =  cvMat(h, w, CV_8UC1, img);
+    // convert input to Mat
+    Mat imgcv(h, w, CV_8UC1, img);
 
-    //CvMat *imgmap = cvCreateMat(FRAME_HEIGHT, FRAME_WIDTH, CV_8UC1);
-            
-    // cvApplyColorMap(imgcv, imgmap, COLORMAP_JET);
-            
-    //CsvColorMap()
+    // Holds the colormap version of the image:
+    Mat imgmap;
+    
 
+    // Apply the colormap:
+    applyColorMap(imgcv, imgmap, COLORMAP_HOT);
                 
     // show the image
-     cvShowImage("mainWin",  &imgcv );
+    imshow("mainWin", imgmap);
   
-    // wait for a key
-    cvWaitKey(1);
+    // wait for a key, without it window would not show
+    waitKey(1);
         
     return 0;
 }
