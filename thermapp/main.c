@@ -13,6 +13,7 @@
 #include <highgui.h> 
 
 
+
 #define VIDEO_DEVICE "/dev/video2" //FIXME: read from command line
 #define FRAME_WIDTH  384
 #define FRAME_HEIGHT 288
@@ -206,7 +207,11 @@ int main(int argc, char *argv[]) {
 
             CvMat imgcv = cvMat(FRAME_HEIGHT, FRAME_WIDTH, CV_8UC1, img);
 
-
+            //CvMat *imgmap = cvCreateMat(FRAME_HEIGHT, FRAME_WIDTH, CV_8UC1);
+            
+            // cvApplyColorMap(imgcv, imgmap, COLORMAP_JET);
+            
+            //CsvColorMap()
 
  // show the image
   cvShowImage("mainWin",  &imgcv );
