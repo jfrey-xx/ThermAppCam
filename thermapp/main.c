@@ -12,6 +12,8 @@
 #include <cv.h>
 #include <highgui.h> 
 
+#include "process.h"
+
 
 
 #define VIDEO_DEVICE "/dev/video2" //FIXME: read from command line
@@ -219,6 +221,7 @@ int main(int argc, char *argv[]) {
   // wait for a key
   cvWaitKey(1);
   
+  thing();
   
         write(fdwr, img, 165888);
       }
