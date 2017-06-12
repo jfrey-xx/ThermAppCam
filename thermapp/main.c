@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
 
 
        
-        thing(img, FRAME_WIDTH, FRAME_HEIGHT);
+        thing(img, FRAME_WIDTH, FRAME_HEIGHT, 1, 1, -1);
   
         write(fdwr, img, 165888);
       }
