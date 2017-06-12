@@ -9,7 +9,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <assert.h>
-#include <cv.h>
 #include <highgui.h> 
 
 #include "process.h"
@@ -201,27 +200,10 @@ int main(int argc, char *argv[]) {
 	for (i = PIXELS_DATA_SIZE; i < 165888; i++) {
 		img[i] = 128;
 	}
-	
-	  // create a window
-        cvNamedWindow("mainWin",  CV_WINDOW_AUTOSIZE); 
-        cvMoveWindow("mainWin", 100, 100);
-  
 
-            CvMat imgcv = cvMat(FRAME_HEIGHT, FRAME_WIDTH, CV_8UC1, img);
 
-            //CvMat *imgmap = cvCreateMat(FRAME_HEIGHT, FRAME_WIDTH, CV_8UC1);
-            
-            // cvApplyColorMap(imgcv, imgmap, COLORMAP_JET);
-            
-            //CsvColorMap()
-
- // show the image
-  cvShowImage("mainWin",  &imgcv );
- 
-  // wait for a key
-  cvWaitKey(1);
-  
-  thing();
+       
+        thing(img, FRAME_WIDTH, FRAME_HEIGHT);
   
         write(fdwr, img, 165888);
       }
