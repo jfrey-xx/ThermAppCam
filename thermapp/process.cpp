@@ -12,7 +12,7 @@ extern "C" {
 using namespace std;
 using namespace cv;
 
-int thing(uint8_t img[], int w, int h, int show, int doflip, int flipcode) { 
+uint8_t * thing(uint8_t img[], int w, int h, int show, int doflip, int flipcode) { 
 
     // convert input to Mat
     Mat imgcv(h, w, CV_8UC1, img);
@@ -39,7 +39,13 @@ int thing(uint8_t img[], int w, int h, int show, int doflip, int flipcode) {
         // wait for a key, without it window would not show
         waitKey(1);
     }
-        
-    return 0;
+    
+    // allocate buffer to persist after exit
+    Mat *imgret = new Mat(imgflip);
+    // release local variables. TODO: optimize and check for leaks
+    imgcv.release();
+    imgmap.release();
+    imgflip.release();
+    return imgret->data;
 }
 

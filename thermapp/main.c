@@ -18,54 +18,6 @@
 #define VIDEO_DEVICE "/dev/video2" //FIXME: read from command line
 #define FRAME_WIDTH  384
 #define FRAME_HEIGHT 288
-//#define FRAME_FORMAT V4L2_PIX_FMT_GREY
-#define FRAME_FORMAT V4L2_PIX_FMT_YUV420
-#define ROUND_UP_2(num) (((num)+1)&~1)
-#define ROUND_UP_4(num) (((num)+3)&~3)
-#define ROUND_UP_8(num)  (((num)+7)&~7)
-#define ROUND_UP_16(num) (((num)+15)&~15)
-#define ROUND_UP_32(num) (((num)+31)&~31)
-#define ROUND_UP_64(num) (((num)+63)&~63)
-
-int format_properties(const unsigned int format,
-                      const unsigned int width,
-                      const unsigned int height,
-                      size_t*linewidth,
-                      size_t*framewidth) {
-    unsigned int lw, fw;
-    switch(format) {
-    case V4L2_PIX_FMT_YUV420:
-        lw = width; /* ??? */
-        fw = ROUND_UP_4 (width) * ROUND_UP_2 (height);
-        fw += 2 * ((ROUND_UP_8 (width) / 2) * (ROUND_UP_2 (height) / 2));
-        break;
-    case V4L2_PIX_FMT_YVU420:
-        lw = width; /* ??? */
-        fw = ROUND_UP_4 (width) * ROUND_UP_2 (height);
-        fw += 2 * ((ROUND_UP_8 (width) / 2) * (ROUND_UP_2 (height) / 2));
-        break;
-    case V4L2_PIX_FMT_UYVY:
-    case V4L2_PIX_FMT_Y41P:
-    case V4L2_PIX_FMT_YUYV:
-    case V4L2_PIX_FMT_YVYU:
-        lw = (ROUND_UP_2 (width) * 2);
-        fw = lw * height;
-        break;
-    case V4L2_PIX_FMT_Y10:
-        fprintf(stdout,"S/W\n");
-        lw = width;
-        fw = width * height;
-        break;
-    default:
-        return 0;
-    }
-    fprintf(stdout,"framewidth %d\n", fw);
-    fprintf(stdout,"linewidth %d\n", lw);
-    if(linewidth)*linewidth=lw;
-    if(framewidth)*framewidth=fw;
-
-    return 1;
-}
 
 int main(int argc, char *argv[]) {
     ThermApp *therm = thermapp_initUSB();
@@ -98,27 +50,17 @@ int main(int argc, char *argv[]) {
 
     ret_code = ioctl(fdwr, VIDIOC_G_FMT, &vid_format);
 
-    size_t framesize;
-    size_t linewidth;
     vid_format.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
     vid_format.fmt.pix.width = FRAME_WIDTH;
     vid_format.fmt.pix.height = FRAME_HEIGHT;
-    vid_format.fmt.pix.pixelformat = FRAME_FORMAT;
-    vid_format.fmt.pix.sizeimage = framesize;
+    vid_format.fmt.pix.pixelformat = V4L2_PIX_FMT_BGR24;
+    vid_format.fmt.pix.sizeimage =   FRAME_WIDTH  * FRAME_HEIGHT * 3;
     vid_format.fmt.pix.field = V4L2_FIELD_NONE;
-    vid_format.fmt.pix.bytesperline = linewidth;
+    vid_format.fmt.pix.bytesperline = FRAME_WIDTH*3;
     vid_format.fmt.pix.colorspace = V4L2_COLORSPACE_SRGB;
 
     ret_code = ioctl(fdwr, VIDIOC_S_FMT, &vid_format);
 
-    //assert(ret_code != -1);
-
-    if(!format_properties(vid_format.fmt.pix.pixelformat,
-                          vid_format.fmt.pix.width, vid_format.fmt.pix.height,
-                          &linewidth,
-                          &framesize)) {
-        printf("unable to guess correct settings for format '%d'\n", FRAME_FORMAT);
-    }
 
     short frame[PIXELS_DATA_SIZE];
     uint8_t img[165888];
@@ -201,11 +143,13 @@ int main(int argc, char *argv[]) {
 		img[i] = 128;
 	}
 
-
-       
-        thing(img, FRAME_WIDTH, FRAME_HEIGHT, 1, 1, -1);
-  
-        write(fdwr, img, 165888);
+        // retrieve image colorized
+        uint8_t *imgr = thing(img, FRAME_WIDTH, FRAME_HEIGHT, 1, 1, -1);
+        // compute size and write to loopback
+        int len = FRAME_HEIGHT * FRAME_WIDTH * 3; //sizeof(&imgr)/sizeof(imgr[0]);
+        write(fdwr, imgr, len);
+        // free pointer ??
+        // free(imgr); // crashes...
       }
     }
 
