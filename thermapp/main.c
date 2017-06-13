@@ -18,6 +18,8 @@
 #define VIDEO_DEVICE "/dev/video2" //FIXME: read from command line
 #define FRAME_WIDTH  384
 #define FRAME_HEIGHT 288
+// will be used to avoid active waiting
+#define FPS 25
 
 int main(int argc, char *argv[]) {
     ThermApp *therm = thermapp_initUSB();
@@ -155,6 +157,11 @@ int main(int argc, char *argv[]) {
         write(fdwr, imgdest, len);
         // free pointer ??
         //free(imgr); // crashes...
+      }
+      else {
+        // wait for next frame to be ready, we don't want to exaust the cpu
+        unsigned int framedelay = 1000000/FPS;
+        usleep(framedelay);
       }
     }
 
