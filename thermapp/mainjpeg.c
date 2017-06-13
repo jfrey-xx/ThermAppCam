@@ -11,7 +11,9 @@
 #define FRAME_WIDTH  384
 #define FRAME_HEIGHT 288
 // will be used to avoid active waiting
-#define FPS 25
+#define FPS 10
+
+unsigned int framedelay = 1000000/FPS;
 
 int main(int argc, char *argv[]) {
     ThermApp *therm = thermapp_initUSB();
@@ -80,15 +82,10 @@ int main(int argc, char *argv[]) {
 	// end of get cal
 	printf("Calibration finished\n");
         
-    // 
-        
-    // compute size of an image
-    int len = FRAME_HEIGHT * FRAME_WIDTH * 3;
-    // buffer to hold colormap
-    uint8_t imgdest[len];
     while (1) {
       if (thermapp_GetImage(therm, frame)) {
-        int i;
+          
+            int i;
 	int frameMax = ((frame[0] + pre_offset_cal - image_cal[0]) * gain_cal) + offset_cal;
 	int frameMin = ((frame[0] + pre_offset_cal - image_cal[0]) * gain_cal) + offset_cal;
         for (i = 0; i < PIXELS_DATA_SIZE; i++) { // get the min and max values
@@ -119,18 +116,17 @@ int main(int argc, char *argv[]) {
 	for (i = PIXELS_DATA_SIZE; i < 165888; i++) {
 		img[i] = 128;
 	}
+	
+	
 
-        // retrieve image colorized, do not show image, flip H and V
-        thing(img, imgdest, FRAME_WIDTH, FRAME_HEIGHT, 0, 1, -1);
-        // export that
-        exportjpeg("therm.jpg", imgdest, FRAME_WIDTH, FRAME_HEIGHT);
+        // convert image to color and export, do not show, flip H and V
+        exportjpeg("therm.jpg", img, FRAME_WIDTH, FRAME_HEIGHT, 0, 1, -1);
         
         // free pointer ??
         //free(imgr); // crashes...
       }
       else {
         // wait for next frame to be ready, we don't want to exaust the cpu
-        unsigned int framedelay = 1000000/FPS;
         usleep(framedelay);
       }
     }
