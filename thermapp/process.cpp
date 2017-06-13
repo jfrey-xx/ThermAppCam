@@ -45,3 +45,9 @@ void thing(uint8_t img[], uint8_t dest[], int w, int h, int show, int doflip, in
     copy(imgflip.data, imgflip.data+len, dest);
 }
 
+
+void exportjpeg(const char *filename, uint8_t img[], int w, int h) {
+    // convert input to Mat
+    Mat imgcv(h, w, CV_8UC3, img);
+    imwrite(filename, imgcv);
+}

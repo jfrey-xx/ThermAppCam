@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "process.h"
 
 
@@ -121,9 +120,10 @@ int main(int argc, char *argv[]) {
 		img[i] = 128;
 	}
 
-        // retrieve image colorized
-        thing(img, imgdest, FRAME_WIDTH, FRAME_HEIGHT, 1, 1, -1);
-        
+        // retrieve image colorized, do not show image, flip H and V
+        thing(img, imgdest, FRAME_WIDTH, FRAME_HEIGHT, 0, 1, -1);
+        // export that
+        exportjpeg("therm.jpg", imgdest, FRAME_WIDTH, FRAME_HEIGHT);
         
         // free pointer ??
         //free(imgr); // crashes...
