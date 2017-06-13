@@ -1,20 +1,14 @@
 #include "thermapp.h"
 
-#include <linux/videodev2.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
-#include <assert.h>
 
 #include "process.h"
 
 
-
-#define VIDEO_DEVICE "/dev/video2" //FIXME: read from command line
 #define FRAME_WIDTH  384
 #define FRAME_HEIGHT 288
 // will be used to avoid active waiting
@@ -37,31 +31,7 @@ int main(int argc, char *argv[]) {
         thermapp_FrameRequest_thread(therm);
     }
 
-    struct v4l2_capability vid_caps;
-    struct v4l2_format vid_format;
-
-    const char *video_device = VIDEO_DEVICE;
-    int fdwr = open(video_device, O_RDWR);
-    assert(fdwr >= 0);
-
-    int ret_code = ioctl(fdwr, VIDIOC_QUERYCAP, &vid_caps);
-    assert(ret_code != -1);
-
-    memset(&vid_format, 0, sizeof(vid_format));
-
-    ret_code = ioctl(fdwr, VIDIOC_G_FMT, &vid_format);
-
-    vid_format.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
-    vid_format.fmt.pix.width = FRAME_WIDTH;
-    vid_format.fmt.pix.height = FRAME_HEIGHT;
-    vid_format.fmt.pix.pixelformat = V4L2_PIX_FMT_BGR24;
-    vid_format.fmt.pix.sizeimage =   FRAME_WIDTH  * FRAME_HEIGHT * 3;
-    vid_format.fmt.pix.field = V4L2_FIELD_NONE;
-    vid_format.fmt.pix.bytesperline = FRAME_WIDTH*3;
-    vid_format.fmt.pix.colorspace = V4L2_COLORSPACE_SRGB;
-
-    ret_code = ioctl(fdwr, VIDIOC_S_FMT, &vid_format);
-
+    
 
     short frame[PIXELS_DATA_SIZE];
     uint8_t img[165888];
@@ -153,7 +123,8 @@ int main(int argc, char *argv[]) {
 
         // retrieve image colorized
         thing(img, imgdest, FRAME_WIDTH, FRAME_HEIGHT, 1, 1, -1);
-        write(fdwr, imgdest, len);
+        
+        
         // free pointer ??
         //free(imgr); // crashes...
       }
@@ -164,7 +135,6 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    close(fdwr);
     thermapp_Close(therm);
     return 0;
 }

@@ -17,3 +17,8 @@ This fork is designed to allow the Therm-App thermal imaging camera for use as a
 * Histogram Equalization instead of linear image range scaling
 * Smarter dead pixel detection
 * Colour LUT support
+
+
+# Fork
+
+Here try to use a color scale for better looking image, and add an export to jpeg file.

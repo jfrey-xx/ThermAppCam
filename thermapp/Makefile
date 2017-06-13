@@ -9,18 +9,15 @@ CXXFLAGS=$(shell pkg-config  --cflags libusb-1.0 opencv) -Wall   -lstdc++
 LFLAGS=$(shell pkg-config --libs  libusb-1.0 opencv) -lpthread 
 
 
-SRC := $(wildcard *.c)
-SRCPP := $(wildcard *.cpp)
-OBJS := $(SRC:.c=.o)
-OBJSCPP := $(SRCPP:.cpp=.o)
-
-
 .PHONY : all clean
-all: prog
+all: tov4l tojpeg
 
 
-prog: $(OBJS) $(OBJSCPP)
-	$(CXX)  $(OBJS) $(OBJSCPP) $(LFLAGS)  -o $@ 
+tojpeg: mainjpeg.o thermapp.o process.o
+	$(CXX) $^  $(LFLAGS)  -o $@ 
+	
+tov4l: main.o thermapp.o process.o
+	$(CXX)  $^ $(LFLAGS)  -o $@ 
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@ -I.
