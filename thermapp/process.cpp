@@ -12,7 +12,7 @@ extern "C" {
 using namespace std;
 using namespace cv;
 
-uint8_t * thing(uint8_t img[], int w, int h, int show, int doflip, int flipcode) { 
+void thing(uint8_t img[], uint8_t dest[], int w, int h, int show, int doflip, int flipcode) { 
 
     // convert input to Mat
     Mat imgcv(h, w, CV_8UC1, img);
@@ -40,12 +40,8 @@ uint8_t * thing(uint8_t img[], int w, int h, int show, int doflip, int flipcode)
         waitKey(1);
     }
     
-    // allocate buffer to persist after exit
-    Mat *imgret = new Mat(imgflip);
-    // release local variables. TODO: optimize and check for leaks
-    imgcv.release();
-    imgmap.release();
-    imgflip.release();
-    return imgret->data;
+    // copy buffer to destination
+    int len = w * h * 3; // 3 channels image
+    copy(imgflip.data, imgflip.data+len, dest);
 }
 

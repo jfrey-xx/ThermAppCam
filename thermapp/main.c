@@ -109,6 +109,13 @@ int main(int argc, char *argv[]) {
 
 	// end of get cal
 	printf("Calibration finished\n");
+        
+    // 
+        
+    // compute size of an image
+    int len = FRAME_HEIGHT * FRAME_WIDTH * 3;
+    // buffer to hold colormap
+    uint8_t imgdest[len];
     while (1) {
       if (thermapp_GetImage(therm, frame)) {
         int i;
@@ -144,12 +151,10 @@ int main(int argc, char *argv[]) {
 	}
 
         // retrieve image colorized
-        uint8_t *imgr = thing(img, FRAME_WIDTH, FRAME_HEIGHT, 1, 1, -1);
-        // compute size and write to loopback
-        int len = FRAME_HEIGHT * FRAME_WIDTH * 3; //sizeof(&imgr)/sizeof(imgr[0]);
-        write(fdwr, imgr, len);
+        thing(img, imgdest, FRAME_WIDTH, FRAME_HEIGHT, 1, 1, -1);
+        write(fdwr, imgdest, len);
         // free pointer ??
-        // free(imgr); // crashes...
+        //free(imgr); // crashes...
       }
     }
 
